@@ -1,15 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
-#include <vector>
-#include <set>
-#include <string>
-#include <algorithm>
-#include <cstring>
-#include <math.h>
-using namespace std;
+#include "2019_big_data.h"
 
 
-vector<string> split(const string& str, const string& delim) {
+/*vector<string> split(const string& str, const string& delim) {
     vector<string> res;
     char* source = new char[str.length() + 1];
     strcpy(source, str.c_str());
@@ -20,33 +13,18 @@ vector<string> split(const string& str, const string& delim) {
     }
     delete[] source;
     return res;
+}*/
+
+inline bool in_array(int cr, int cc, int r, int c, int arr[25][25])
+{
+    if (arr[cr][cc] != -1 || cr < 0 || cc < 0 || cr >= r || cc >= c)
+        return false;
+    return true;
 }
 
-int T, N;
-
-
 int main()
-{
-    ios::sync_with_stdio(false);
-    cin >> T;
-    while (T--) {
-        cin >> N;
-        int min_dist = 0x7fffffff;
-        for (int i = 0; i < N; ++i) {
-            int x, y;
-            cin >> x >> y;
-            all_pts[i][0] = x;
-            all_pts[i][1] = y;
-            for (int j = 0; j < i; ++j) {
-                int tmp = dist(x, y, all_pts[j][0], all_pts[j][1]);
-                if (tmp < min_dist) {
-                    min_dist = tmp;
-                }
-            }
-        }
-        cout << min_dist << endl;
-    }
-    
-    
+{   
+    //SOLVE_6();
+
     return 0;
 }
