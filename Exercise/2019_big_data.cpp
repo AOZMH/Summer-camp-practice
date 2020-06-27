@@ -213,3 +213,99 @@ int SOLVE_6()
     }
     return 0;
 }
+
+struct state {
+    string str;
+    int step;
+    state(const string &s, const int &stp):str(s),step(stp) {}
+};
+
+int SOLVE_7()
+{
+    queue<state> que;
+    string st, ed, tmp;
+    map<string, bool> dict;
+    cin >> st >> ed;
+    while (cin >> tmp) {
+        dict[tmp] = true;
+    }
+    
+    que.push(state(st, 1));
+    while(!que.empty()){
+        state cur_state = que.front();
+        que.pop();
+        // if can convert to answer
+        int match_len = 0;
+        for (int i = 0; i < cur_state.str.length(); ++i) {
+            if (cur_state.str[i] == ed[i])
+                ++match_len;
+        }
+        if (match_len == cur_state.str.length() - 1) {
+            // got answer!
+            cout << cur_state.step + 1;
+            return 0;
+        }
+
+        map<string, bool>::iterator ptr;
+        for (ptr = dict.begin(); ptr != dict.end(); ++ptr) {
+            // judge duplicity
+            if (!ptr->second)
+                continue;
+            // judge if can convert
+            int match_len = 0;
+            for (int i = 0; i < cur_state.str.length(); ++i) {
+                if (cur_state.str[i] == ptr->first[i]) {
+                    ++match_len;
+                }
+            }
+            if (match_len != cur_state.str.length() - 1)
+                continue;
+            // can convert
+            ptr->second = false;
+            que.push(state(ptr->first, cur_state.step + 1));
+        }
+    }
+    cout << 0;
+
+    return 0;
+}
+
+
+int SOLVE_3()
+{
+    int N, K, lens[10005];
+    cin >> N >> K;
+    float tmp;
+    for (int i = 0; i < N; ++i) {
+        cin >> tmp;
+        lens[i] = tmp * 100;
+    }
+    int l_len = 0, r_len = 10000002;
+
+    while ((l_len < r_len-1)) {
+        int mid = (l_len + r_len) / 2;
+        if (mid == 0)
+            break;
+        int avail = 0;
+        for (int i = 0; i < N; ++i) {
+            avail += lens[i] / mid;
+            if (avail >= K)
+                break;
+        }
+        if (avail >= K) {
+            l_len = mid;
+            continue;
+        }
+        else {
+            r_len = mid;
+            continue;
+        }
+    }
+
+    //printf("%.2f", float(l_len) / 100);
+    cout.flags(ios::fixed);
+    cout.precision(2);
+    cout << float(l_len) / 100;
+
+    return 0;
+}
