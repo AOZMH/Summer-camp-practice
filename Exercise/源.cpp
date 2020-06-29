@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "2019_big_data.h"
+#include "2018_big_data.h"
 
 
 /*vector<string> split(const string& str, const string& delim) {
@@ -18,7 +18,7 @@
 
 int main()
 {   
-    SOLVE_3();
-
+    solve_5();
+	
     return 0;
 }
