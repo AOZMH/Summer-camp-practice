@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <queue>
 #include <map>
+#include <set>
 #include <math.h>
 #include <stack>
 using namespace std;
@@ -17,4 +18,6 @@ void solve_2();
 void solve_3();
 void solve_4();
 void solve_5();
+void solve_6();
+void solve_7();
 void solve_8();

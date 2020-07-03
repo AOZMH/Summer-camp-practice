@@ -94,7 +94,7 @@ void solve_4()
 }
 
 
-void solve_8()
+void solve_7()
 {
 	int n;
 	while (1) {
@@ -270,6 +270,292 @@ void solve_5()
 		}
 		else {
 			cout << "Not Sure" << endl;
+		}
+
+	}
+}
+
+void solve_6()
+{
+	int is_greater[27][27] = {};
+	char orders[27] = {};
+	int n, m;
+	while (1) {
+		cin >> n >> m;
+		if (n == 0 && m == 0)
+			break;
+		memset(is_greater, 0, sizeof(is_greater));
+		for (int i = 0; i < n; ++i) {
+			is_greater[i][i] = -1;
+		}
+		string str;
+		int stop_step = -1;
+		bool incons = false, clear = false;
+		for (int i = 0; i < m; ++i) {
+			cin >> str;
+			if (incons || clear)
+				continue;
+
+			memset(orders, 0, sizeof(orders));
+			int small = str[0] - 'A';
+			int big = str[2] - 'A';
+			// cout << small << " " << big << endl;
+			if (is_greater[big][small] == -1) {
+				stop_step = i + 1;
+				incons = true;
+				continue;
+			}
+			is_greater[big][small] = 1;
+			if (is_greater[small][big] == 1) {
+				stop_step = i + 1;
+				//assert(false);
+				incons = true;
+				continue;
+			}
+			is_greater[small][big] = -1;
+			for (int bb = 0; bb < n; ++bb) {
+				if (is_greater[bb][big] != 1) {
+					continue;
+				}
+				if (is_greater[bb][small] == -1) {
+					stop_step = i + 1;
+					incons = true;
+					break;
+				}
+				is_greater[bb][small] = 1;
+				is_greater[small][bb] = -1;
+				for (int ss = 0; ss < n; ++ss) {
+					if (is_greater[small][ss] != 1) {
+						continue;
+					}
+					if (is_greater[bb][ss] == -1) {
+						stop_step = i + 1;
+						incons = true;
+						break;
+					}
+					is_greater[bb][ss] = 1;
+					is_greater[ss][bb] = -1;
+				}
+			}
+			for (int ss = 0; ss < n; ++ss) {
+				if (is_greater[small][ss] != 1) {
+					continue;
+				}
+				if (is_greater[big][ss] == -1) {
+					stop_step = i + 1;
+					incons = true;
+					break;
+				}
+				is_greater[big][ss] = 1;
+				is_greater[ss][big] = -1;
+			}
+
+			if (incons)
+				continue;
+			int ii;
+			for (ii = 0; ii < n; ++ii) {
+				int small_ct = 0;
+				for (int j = 0; j < n; ++j)
+					if (is_greater[ii][j]==1)
+						++small_ct;
+				if (orders[small_ct]) {	//!=0
+					break;
+				}
+				orders[small_ct] = 'A' + ii;
+			}
+			if (ii == n) {
+				clear = true;
+				stop_step = i + 1;
+			}	
+		}
+
+		if (incons) {
+			cout << "Inconsistency found after " << stop_step << " relations." << endl;
+		}
+		else if (clear) {
+			cout << "Sorted sequence determined after " << stop_step << " relations: ";
+			for (int j = 0; j < n; ++j) {
+				cout << orders[j];
+			}
+			cout << "." << endl;
+		}
+		else {
+			cout << "Sorted sequence cannot be determined." << endl;
+		}
+	}
+}
+
+
+int points[24][2] = { {0,2},{0,4},{1,2},{1,4},{2,0},{2,1},{2,2},{2,3},{2,4},
+					{2,5} ,{2,6},{3,2},{3,4} ,{4,0},{4,1},{4,2},{4,3},{4,4},
+					{4,5} ,{4,6}, {5,2},{5,4},{6,2},{6,4} };
+
+int board[7][7] = {};
+
+struct node {
+	string state;
+	int step;
+	string route;
+	node(const string& st, int stp, const string& rt) :state(st), step(stp), route(rt) {}
+};
+
+struct avail_ret {
+	bool avail;
+	int symbol;
+	avail_ret(bool av, int sy) :avail(av), symbol(sy) {}
+};
+
+avail_ret is_avail(const string& state)
+{
+	int symb = state[6] - '0';
+	char cur = state[6];
+	if (state[7] != cur || state[8] != cur || state[11] != cur || state[12] != cur ||
+		state[15] != cur || state[16] != cur || state[17] != cur) {
+		return avail_ret(false, -1);
+	}
+	return avail_ret(true, symb);
+}
+
+string permute(string init_state, int way)
+{
+	if (way == 1) {
+		char tmp = init_state[0];
+		init_state[0] = init_state[2];
+		init_state[2] = init_state[6];
+		init_state[6] = init_state[11];
+		init_state[11] = init_state[15];
+		init_state[15] = init_state[20];
+		init_state[20] = init_state[22];
+		init_state[22] = tmp;
+		return init_state;
+	}
+	if (way == 2) {
+		char tmp = init_state[1];
+		init_state[1] = init_state[3];
+		init_state[3] = init_state[8];
+		init_state[8] = init_state[12];
+		init_state[12] = init_state[17];
+		init_state[17] = init_state[21];
+		init_state[21] = init_state[23];
+		init_state[23] = tmp;
+		return init_state;
+	}
+	if (way == 3) {
+		char tmp = init_state[10];
+		init_state[10] = init_state[9];
+		init_state[9] = init_state[8];
+		init_state[8] = init_state[7];
+		init_state[7] = init_state[6];
+		init_state[6] = init_state[5];
+		init_state[5] = init_state[4];
+		init_state[4] = tmp;
+		return init_state;
+	}
+	if (way == 4) {
+		char tmp = init_state[19];
+		init_state[19] = init_state[18];
+		init_state[18] = init_state[17];
+		init_state[17] = init_state[16];
+		init_state[16] = init_state[15];
+		init_state[15] = init_state[14];
+		init_state[14] = init_state[13];
+		init_state[13] = tmp;
+		return init_state;
+	}
+	if (way == 5) {
+		char tmp = init_state[23];
+		init_state[23] = init_state[21];
+		init_state[21] = init_state[17];
+		init_state[17] = init_state[12];
+		init_state[12] = init_state[8];
+		init_state[8] = init_state[3];
+		init_state[3] = init_state[1];
+		init_state[1] = tmp;
+		return init_state;
+	}
+	if (way == 6) {
+		char tmp = init_state[22];
+		init_state[22] = init_state[20];
+		init_state[20] = init_state[15];
+		init_state[15] = init_state[11];
+		init_state[11] = init_state[6];
+		init_state[6] = init_state[2];
+		init_state[2] = init_state[0];
+		init_state[0] = tmp;
+		return init_state;
+	}
+	if (way == 7) {
+		char tmp = init_state[13];
+		init_state[13] = init_state[14];
+		init_state[14] = init_state[15];
+		init_state[15] = init_state[16];
+		init_state[16] = init_state[17];
+		init_state[17] = init_state[18];
+		init_state[18] = init_state[19];
+		init_state[19] = tmp;
+		return init_state;
+	}
+	if (way == 8) {
+		char tmp = init_state[4];
+		init_state[4] = init_state[5];
+		init_state[5] = init_state[6];
+		init_state[6] = init_state[7];
+		init_state[7] = init_state[8];
+		init_state[8] = init_state[9];
+		init_state[9] = init_state[10];
+		init_state[10] = tmp;
+		return init_state;
+	}
+	assert(false);
+}
+
+void solve_8()
+{
+	while (1) {
+		int num;
+		cin >> num;
+		if (num == 0)
+			break;
+		char nums[25];
+		nums[0] = '0' + num;
+		for (int i = 1; i < 24; ++i) {
+			cin >> num;
+			nums[i] = char('0' + num);
+		}
+		nums[24] = '\0';
+		string init = nums;
+		avail_ret init_res = is_avail(init);
+		if (init_res.avail) {
+			cout << "No moves needed" << endl;
+			cout << init_res.symbol << endl;
+		}
+		queue<node> que;
+		set<string> visited;
+		que.push(node(init, 0, string("")));
+		bool stopped = false;
+		while (!que.empty()) {
+			node cur = que.front();
+			que.pop();
+			for (int cur_way = 1; cur_way <= 8; ++cur_way) {
+				string new_state = permute(cur.state, cur_way);
+				if (visited.find(new_state) != visited.end()) {
+					continue;
+				}
+				char tmp[2] = "0";
+				tmp[0] = 'A' + cur_way - 1;
+				string new_route = cur.route + tmp;
+
+				avail_ret res = is_avail(new_state);
+				if (res.avail) {
+					cout << new_route << endl << res.symbol << endl;
+					stopped = true;
+					break;
+				}
+				visited.insert(new_state);
+				que.push(node(new_state, cur.step + 1, new_route));
+			}
+			if (stopped)
+				break;
 		}
 
 	}

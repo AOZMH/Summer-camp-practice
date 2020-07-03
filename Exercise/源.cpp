@@ -18,7 +18,7 @@
 
 int main()
 {   
-    solve_5();
+    solve_8();
 	
     return 0;
 }
