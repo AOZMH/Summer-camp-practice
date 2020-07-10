@@ -390,8 +390,6 @@ int points[24][2] = { {0,2},{0,4},{1,2},{1,4},{2,0},{2,1},{2,2},{2,3},{2,4},
 					{2,5} ,{2,6},{3,2},{3,4} ,{4,0},{4,1},{4,2},{4,3},{4,4},
 					{4,5} ,{4,6}, {5,2},{5,4},{6,2},{6,4} };
 
-int board[7][7] = {};
-
 struct node {
 	string state;
 	int step;
@@ -414,6 +412,21 @@ avail_ret is_avail(const string& state)
 		return avail_ret(false, -1);
 	}
 	return avail_ret(true, symb);
+}
+
+int cal_mismatch(string state)
+{
+	int acc[4] = { 0 };
+	memset(acc, 0, sizeof(acc));
+	int pos[8] = { 6,7,8,11,12,15,16,17 };
+	for (int i = 0; i < 8; ++i) {
+		int cur_num = state[pos[i]] - '0';
+		assert(cur_num == 1 || cur_num == 2 || cur_num == 3);
+		++acc[cur_num];
+	}
+	int max_num = max(acc[1], acc[2]);
+	max_num = max(max_num, acc[3]);
+	return 8 - max_num;
 }
 
 string permute(string init_state, int way)
@@ -509,7 +522,7 @@ string permute(string init_state, int way)
 	assert(false);
 }
 
-void solve_8()
+void solve_8_bfs()
 {
 	while (1) {
 		int num;
@@ -558,5 +571,88 @@ void solve_8()
 				break;
 		}
 
+	}
+}
+
+vector<char> route;
+set<string> visited;
+
+avail_ret dfs_ida(string state, int remain_steps)
+{
+
+	int least_steps_needed = cal_mismatch(state);
+	if (remain_steps < least_steps_needed) {
+		return avail_ret(false, -1);
+	}
+	avail_ret res = is_avail(state);
+	if (res.avail) {
+		//assert(false);
+		return res;
+	}
+
+	if (remain_steps <= 0) {
+		avail_ret res = is_avail(state);
+		return res;
+	}
+
+	route.push_back('0');
+	for (int cur_way = 1; cur_way <= 8; ++cur_way) {
+		string new_state = permute(state, cur_way);
+		if (visited.find(new_state) != visited.end()) {
+			continue;
+		}
+		route[route.size() - 1] = 'A' + cur_way - 1;
+		visited.insert(new_state);
+		avail_ret res = dfs_ida(new_state, remain_steps - 1);
+		if (res.avail) {
+			//route.pop_back();
+			return res;
+		}
+		visited.erase(new_state);
+	}
+	route.pop_back();
+	return avail_ret(false, -1);
+}
+
+
+void solve_8()
+{
+	while (1) {
+
+		int num;
+		cin >> num;
+		if (num == 0)
+			break;
+		//if (ct > 17)	// #18 -> WA
+		//	assert(false);
+		char nums[25];
+		nums[0] = '0' + num;
+		for (int i = 1; i < 24; ++i) {
+			cin >> num;
+			nums[i] = char('0' + num);
+		}
+		nums[24] = '\0';
+		string init = nums;
+		avail_ret init_res = is_avail(init);
+		if (init_res.avail) {
+			cout << "No moves needed" << endl;
+			cout << init_res.symbol << endl;
+		}
+
+		//int max_steps = cal_mismatch(init);
+		int max_steps = 1;
+		for (;; ++max_steps) {
+			visited.clear();
+			route.clear();
+			avail_ret res = dfs_ida(init, max_steps);
+
+			if (!res.avail)
+				continue;
+			for (int i = 0; i < max_steps; ++i) {
+				cout << route[i];
+			}
+			cout << endl << res.symbol << endl;
+			break;
+		}
 	}
 }
